@@ -1,20 +1,29 @@
 # Process-tinted WezTerm
 
-A [WezTerm](https://wezterm.org) config that brings Ptyxis-style "danger tinting" to tabs, plus saner keys.
+A [WezTerm](https://wezterm.org) config that colors each tab by what is running in it, Ptyxis-style, so you always notice when you're root, on a remote machine, or in Claude Code. It also makes Ctrl+C and Ctrl+V behave the way you'd expect.
 
-| Running in the tab | Tab + header color |
+![Claude Code tab: orange header and tab](docs/claude.png)
+
+| sudo | ssh |
 |---|---|
-| `sudo`, `su`, `doas`, `run0`, `pkexec` | red `#c01c28` |
-| `ssh`, `mosh`, `et`, `telnet`, `scp`, `sftp` | purple `#613583` |
-| `claude` (Claude Code) | orange `#d97757` |
+| ![sudo tab: red](docs/sudo.png) | ![ssh tab: purple](docs/ssh.png) |
 
-- Each tab is colored by its own foreground process. The header (title bar) follows the active tab.
-- **Ctrl+C** copies if text is selected, otherwise sends ^C (interrupt). **Ctrl+V** pastes. Ctrl+Shift+C/V still work.
-- **Ctrl+Shift+E** (Cmd+Shift+E on macOS) sets the *entire* tab title, which won't get overwritten by programs. Enter an empty title to go back to the automatic one.
+## Features
+
+| Running in the tab | Color |
+|---|---|
+| `sudo`, `su`, `doas`, `run0`, `pkexec` | red |
+| `ssh`, `mosh`, `et`, `telnet`, `scp`, `sftp` | purple |
+| `claude` (Claude Code) | orange |
+
+- Each tab is colored by its own foreground process. The header bar takes on a slightly darker shade of the active tab's color, so the active tab still stands out.
+- Tab titles follow the running program (`zsh` → `vim` → `zsh`) without waiting for a mouse hover.
+- **Ctrl+C** copies when text is selected, otherwise it sends ^C. **Ctrl+V** pastes. Ctrl+Shift+C/V still work.
+- **Ctrl+Shift+E** (Cmd+Shift+E on macOS) sets the whole tab title, and programs can't overwrite it. An empty title switches back to the automatic one.
 
 ## Install
 
-Linux (Fedora: `sudo dnf install wezterm` from the WezTerm COPR / Flatpak; Ubuntu: WezTerm apt repo) or macOS (`brew install --cask wezterm`), then:
+Install WezTerm (macOS: `brew install --cask wezterm`; Linux: the native package from [wezterm.org](https://wezterm.org/install/linux.html)), then:
 
 ```sh
 mkdir -p ~/.config/wezterm
@@ -23,14 +32,12 @@ ln -sf "$PWD/wezterm.lua" ~/.config/wezterm/wezterm.lua
 
 WezTerm reloads the config automatically when the file changes.
 
-If you use the **Flatpak** build on Linux, the terminal runs inside a sandbox and process detection may not see host processes. Prefer the native package.
-
 ## Customize
 
-Colors, process lists and keys live at the top of `wezterm.lua` (`KIND_COLORS`, `SUPERUSER`, `REMOTE`, `config.keys`).
+Colors, process lists and keys are at the top of `wezterm.lua` (`KIND_COLORS`, `SUPERUSER`, `REMOTE`, `config.keys`).
 
 ## Limitations
 
-- Claude running *on a remote machine* over ssh shows as remote (purple), because only local processes are visible.
-- Colors update by polling (every 0.5 s while the window is focused), so expect a short lag.
-- `sudo` detection relies on WezTerm reading process info for a root-owned `sudo` process. This works on Linux (`/proc/<pid>/comm` is world-readable) but is untested on macOS.
+- Only local processes are detected: Claude Code running *over ssh* shows as remote (purple).
+- Colors and titles are updated by polling every 0.5 s, so changes can take up to half a second to appear.
+- The Linux Flatpak build runs sandboxed and may not see host processes. Use the native package.
