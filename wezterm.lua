@@ -217,7 +217,14 @@ wezterm.on('update-status', function(window, pane)
       inactive_titlebar_bg = colors.inactive,
       font_size = config.window_frame.font_size,
     }
-    overrides.colors = { tab_bar = { inactive_tab_edge = colors.inactive } }
+    overrides.colors = {
+      tab_bar = {
+        inactive_tab_edge = colors.inactive,
+        -- The "+" button: blend into the tinted header bar, highlight on hover.
+        new_tab = { bg_color = colors.frame, fg_color = colors.fg },
+        new_tab_hover = { bg_color = colors.active, fg_color = colors.fg },
+      },
+    }
   else
     overrides.window_frame = nil
     overrides.colors = nil
