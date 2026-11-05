@@ -160,21 +160,50 @@ end)
 
 local window_kind = {}
 
+-- WezTerm only rebuilds the tab bar on certain events (focus, OSC title
+-- change, status text change, ...). A title derived from the foreground
+-- process (zsh -> vim) changes silently, so the tab bar would stay stale
+-- until the mouse hovers it. We track a signature of all tab titles/kinds
+-- and, when it changes, toggle the (invisible) right status, which makes
+-- WezTerm recompute the tab bar.
+local tab_signature = {}
+local status_toggle = {}
+
 wezterm.on('update-status', function(window, pane)
+  local id = window:window_id()
+  local sig = {}
+
   -- Refresh every tab in this window (including background tabs), so that
   -- format-tab-title has ps-based results for root-owned processes.
   local ok, tabs = pcall(function() return window:mux_window():tabs() end)
   if ok and tabs then
     for _, t in ipairs(tabs) do
       local p = t:active_pane()
-      if p and p:pane_id() ~= pane:pane_id() then
-        classify_pane(p, true)
+      if p then
+        local k
+        if p:pane_id() ~= pane:pane_id() then
+          k = classify_pane(p, true)
+        end
+        local okt, ptitle = pcall(function() return p:get_title() end)
+        sig[#sig + 1] = t:get_title() .. '\0' .. (okt and ptitle or '')
+          .. '\0' .. tostring(k)
       end
     end
   end
 
   local kind = classify_pane(pane, true) or 'none'
-  local id = window:window_id()
+  sig[#sig + 1] = kind
+
+  local s = table.concat(sig, '\1')
+  if tab_signature[id] ~= s then
+    tab_signature[id] = s
+    status_toggle[id] = not status_toggle[id]
+  end
+  -- Must be called on EVERY tick: WezTerm schedules the next update-status
+  -- only from set_right_status/set_left_status. An unchanged value just
+  -- re-arms the timer; a changed one also rebuilds the tab bar.
+  window:set_right_status(status_toggle[id] and ' ' or '')
+
   if window_kind[id] == kind then return end
   window_kind[id] = kind
   wezterm.log_info('process-tint: window ' .. id .. ' -> ' .. kind)
