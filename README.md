@@ -1,6 +1,11 @@
 # Process-tinted WezTerm
 
-A [WezTerm](https://wezterm.org) config that colors each tab by what is running in it, Ptyxis-style, so you always notice when you're root, on a remote machine, or in Claude Code. It also makes Ctrl+C and Ctrl+V behave the way you'd expect.
+A [WezTerm](https://wezterm.org) config that:
+- Colors tabs for:
+  - ssh
+  - sudo
+  - Claude Code
+- Makes Ctrl+C copy when you have text selected.
 
 ![Claude Code tab: orange header and tab](docs/claude.png)
 
