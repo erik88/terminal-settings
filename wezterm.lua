@@ -11,12 +11,12 @@ local config = wezterm.config_builder()
 -- Colors per process kind
 ---------------------------------------------------------------------------
 
--- active = active tab, frame = header bar (a darker shade, so the active
--- tab stands out against it), inactive = background tabs / unfocused window
+-- active = active tab, frame = header bar (a shade between inactive and active,
+-- so the active tab stands out), inactive = background tabs / unfocused window
 local KIND_COLORS = {
-  superuser = { active = '#c01c28', frame = '#5c1419', inactive = '#7a1c22', fg = '#ffffff' }, -- red
-  remote    = { active = '#613583', frame = '#2c1a3d', inactive = '#3d2552', fg = '#ffffff' }, -- purple
-  claude    = { active = '#d97757', frame = '#6b3a2b', inactive = '#8a4c38', fg = '#ffffff' }, -- orange
+  superuser = { active = '#c01c28', frame = '#9d1c25', inactive = '#7a1c22', fg = '#ffffff' }, -- red
+  remote    = { active = '#613583', frame = '#4f2d6a', inactive = '#3d2552', fg = '#ffffff' }, -- purple
+  claude    = { active = '#d97757', frame = '#b1614a', inactive = '#8a4c38', fg = '#ffffff' }, -- orange
 }
 
 -- Default header (window frame) colors, used when no special process runs.
