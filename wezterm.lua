@@ -12,7 +12,7 @@ local config = wezterm.config_builder()
 ---------------------------------------------------------------------------
 
 -- active = active tab, frame = header bar (a shade between inactive and active,
--- so the active tab stands out), inactive = background tabs / unfocused window
+-- so the active tab stands out), inactive = background tabs
 local KIND_COLORS = {
   superuser = { active = '#c01c28', frame = '#9d1c25', inactive = '#7a1c22', fg = '#ffffff' }, -- red
   remote    = { active = '#613583', frame = '#4f2d6a', inactive = '#3d2552', fg = '#ffffff' }, -- purple
@@ -214,7 +214,9 @@ wezterm.on('update-status', function(window, pane)
   if colors then
     overrides.window_frame = {
       active_titlebar_bg = colors.frame,
-      inactive_titlebar_bg = colors.inactive,
+      -- Same shade when unfocused, so the "+" button (which has no separate
+      -- unfocused color) still blends in.
+      inactive_titlebar_bg = colors.frame,
       font_size = config.window_frame.font_size,
     }
     overrides.colors = {
