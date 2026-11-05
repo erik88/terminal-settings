@@ -140,6 +140,12 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
   if not title or title == '' then
     title = tab.active_pane.title
   end
+  -- Programs like Claude Code reset the title to "" on exit. WezTerm only
+  -- substitutes the process name for its default title ("wezterm"), so
+  -- do the same for an empty title.
+  if title == '' then
+    title = basename(tab.active_pane.foreground_process_name)
+  end
   title = wezterm.truncate_right(title, math.max(1, max_width - 2))
 
   local kind = classify_pane_id(tab.active_pane.pane_id)
