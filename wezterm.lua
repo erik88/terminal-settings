@@ -271,6 +271,33 @@ local set_tab_title = act.PromptInputLine {
   end),
 }
 
+-- Whether the system clipboard holds text. On error (tool missing), assume
+-- it does, so Ctrl+V keeps pasting as before.
+local function clipboard_has_text()
+  local cmds
+  if wezterm.target_triple:find('darwin') then
+    cmds = { { 'pbpaste' } }
+  elseif wezterm.target_triple:find('windows') then
+    return true
+  else
+    cmds = {
+      { 'wl-paste', '--no-newline', '--type', 'text' },
+      { 'xclip', '-selection', 'clipboard', '-o' },
+      { 'xsel', '--clipboard', '--output' },
+    }
+  end
+  for _, cmd in ipairs(cmds) do
+    local ok, success, stdout, stderr = pcall(wezterm.run_child_process, cmd)
+    if ok and success then return stdout ~= '' end
+    -- The tool ran but found no text (wl-paste: "No suitable type of
+    -- content copied"; xclip: "target STRING not available").
+    if ok and stderr and (stderr:find('No suitable type') or stderr:find('not available')) then
+      return false
+    end
+  end
+  return true
+end
+
 config.keys = {
   -- Ctrl+C: copy if there is a selection, otherwise send ^C (SIGINT).
   {
@@ -286,8 +313,20 @@ config.keys = {
       end
     end),
   },
-  -- Ctrl+V: paste.
-  { key = 'v', mods = 'CTRL', action = act.PasteFrom 'Clipboard' },
+  -- Ctrl+V: paste text. If the clipboard has no text (e.g. an image), pass
+  -- ^V through to the program instead, so apps like Claude Code can read the
+  -- clipboard themselves and paste the image.
+  {
+    key = 'v',
+    mods = 'CTRL',
+    action = wezterm.action_callback(function(window, pane)
+      if clipboard_has_text() then
+        window:perform_action(act.PasteFrom 'Clipboard', pane)
+      else
+        window:perform_action(act.SendKey { key = 'v', mods = 'CTRL' }, pane)
+      end
+    end),
+  },
 
   -- Set the entire tab title.
   { key = 'e', mods = 'CTRL|SHIFT', action = set_tab_title },

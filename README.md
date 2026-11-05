@@ -18,7 +18,7 @@ A [WezTerm](https://wezterm.org) config that colors each tab by what is running 
 
 - Each tab is colored by its own foreground process. The header bar takes on a slightly darker shade of the active tab's color, so the active tab still stands out.
 - Tab titles follow the running program (`zsh` → `vim` → `zsh`) without waiting for a mouse hover.
-- **Ctrl+C** copies when text is selected, otherwise it sends ^C. **Ctrl+V** pastes. Ctrl+Shift+C/V still work.
+- **Ctrl+C** copies when text is selected, otherwise it sends ^C. **Ctrl+V** pastes text, and passes the keystroke through when the clipboard holds an image, so image paste in Claude Code still works. Ctrl+Shift+C/V still work.
 - **Ctrl+Shift+E** (Cmd+Shift+E on macOS) sets the whole tab title, and programs can't overwrite it. An empty title switches back to the automatic one.
 
 ## Install
