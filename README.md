@@ -5,7 +5,7 @@ A [WezTerm](https://wezterm.org) config that:
   - ssh
   - sudo
   - Claude Code
-- Makes Ctrl+C copy when you have text selected.
+- Makes Ctrl+C copy when you have text selected, makes Ctrl+V paste.
 
 ![Claude Code tab: orange header and tab](docs/claude.png)
 
